@@ -15,12 +15,16 @@
  */
 package com.example.android.datafrominternet;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.datafrominternet.utilities.NetworkUtils;
 
@@ -28,6 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
+    final  static String LOG_TAG = MainActivity.class.getSimpleName();
 
     private EditText mSearchBoxEditText;
 
@@ -56,19 +61,43 @@ public class MainActivity extends AppCompatActivity {
         String githubQuery = mSearchBoxEditText.getText().toString();
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
         mUrlDisplayTextView.setText(githubSearchUrl.toString());
+        new GithubQueryTask().execute(githubSearchUrl);
+        /*
         String githubSearchResults = null;
         try {
             githubSearchResults = NetworkUtils.getResponseFromHttpUrl(githubSearchUrl);
             mSearchResultsTextView.setText(githubSearchResults);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "IOException"+e);
         }
-        // TODO (4) Create a new GithubQueryTask and call its execute method, passing in the url to query
+        */
+        // (4) Create a new GithubQueryTask and call its execute method, passing in the url to query
     }
 
-    // TODO (1) Create a class called GithubQueryTask that extends AsyncTask<URL, Void, String>
-    // TODO (2) Override the doInBackground method to perform the query. Return the results. (Hint: You've already written the code to perform the query)
-    // TODO (3) Override onPostExecute to display the results in the TextView
+    // (1) Create a class called GithubQueryTask that extends AsyncTask<URL, Void, String>
+    // (2) Override the doInBackground method to perform the query. Return the results. (Hint: You've already written the code to perform the query)
+    // (3) Override onPostExecute to display the results in the TextView
+    public class GithubQueryTask extends AsyncTask<URL, Void, String> {
+        @Override
+        protected String doInBackground(URL... urls) {
+            URL searchURL = urls[0];
+            String githubSearchResults = null;
+            try {
+                githubSearchResults = NetworkUtils.getResponseFromHttpUrl(searchURL);
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "IOException"+e);
+            }
+            return githubSearchResults;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if (s != null && !s.equals("")) {
+                mSearchResultsTextView.setText(s);
+            }
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,11 +107,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemThatWasClickedId = item.getItemId();
-        if (itemThatWasClickedId == R.id.action_search) {
-            makeGithubSearchQuery();
-            return true;
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Search" menu option
+            case R.id.action_search:
+                Context context = getApplicationContext();
+                CharSequence text = "Search item selected" ;
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+                makeGithubSearchQuery();
+                return true;
+            default:
+                /* an unknown menu item Id was passed */
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 }

@@ -16,6 +16,10 @@
 package com.example.android.datafrominternet.utilities;
 
 import android.net.Uri;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +28,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+
 /**
  * These utilities will be used to communicate with the network.
  */
 public class NetworkUtils {
+    final static String LOG_TAG = NetworkUtils.class.getSimpleName();
 
     final static String GITHUB_BASE_URL =
             "https://api.github.com/search/repositories";
@@ -48,16 +55,16 @@ public class NetworkUtils {
      * @return The URL to use to query the GitHub.
      */
     public static URL buildUrl(String githubSearchQuery) {
-        Uri builtUri = Uri.parse(GITHUB_BASE_URL).buildUpon()
+        Uri builtUri = Uri.parse(GITHUB_BASE_URL)
+                .buildUpon()
                 .appendQueryParameter(PARAM_QUERY, githubSearchQuery)
                 .appendQueryParameter(PARAM_SORT, sortBy)
                 .build();
-
         URL url = null;
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "MalformedURLException:" + e);
         }
 
         return url;
@@ -86,6 +93,22 @@ public class NetworkUtils {
             }
         } finally {
             urlConnection.disconnect();
+        }
+    }
+    public static void dummy (String weatherConditionJSONSting) {
+        try {
+            JSONObject weatherCondition = new JSONObject(weatherConditionJSONSting);
+            JSONObject name = weatherCondition.getJSONObject("temp");
+            String minTemp = name.getString("min");
+            String maxTemp = name.getString("max");
+            JSONObject weather = weatherCondition.getJSONObject("weather");
+            String id = weather.getString("id");
+            String condition = weather.getString("condition");
+            String description = weather.getString("description");
+            String pressure = weatherCondition.getString("pressure");
+            String humidity = weatherCondition.getString("humidity");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

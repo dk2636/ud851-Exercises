@@ -15,16 +15,21 @@
  */
 package com.example.android.datafrominternet;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.datafrominternet.utilities.NetworkUtils;
 
+import java.io.IOException;
 import java.net.URL;
+
+import static com.example.android.datafrominternet.utilities.NetworkUtils.getResponseFromHttpUrl;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +61,13 @@ public class MainActivity extends AppCompatActivity {
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
         mUrlDisplayTextView.setText(githubSearchUrl.toString());
         // TODO (2) Call getResponseFromHttpUrl and display the results in mSearchResultsTextView
+        String githubResults;
+        try {
+            githubResults = getResponseFromHttpUrl(githubSearchUrl);
+            mSearchResultsTextView.setText(githubResults);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
         // TODO (3) Surround the call to getResponseFromHttpUrl with a try / catch block to catch an IOException
     }
 
@@ -67,11 +79,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemThatWasClickedId = item.getItemId();
-        if (itemThatWasClickedId == R.id.action_search) {
-            makeGithubSearchQuery();
-            return true;
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Search" menu option
+            case R.id.action_search:
+                Context context = getApplicationContext();
+                CharSequence text = "Search item selected" ;
+                Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
+                toast.show();
+                makeGithubSearchQuery();
+                return true;
+            default:
+                /* an unknown menu item Id was passed */
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 }

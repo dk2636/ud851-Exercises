@@ -15,4 +15,10 @@
   -->
 <resources>
     <string name="app_name">Github Query</string>
+    <!-- hint telling the user to enter a query and the click search -->
+    <string name="hint_search_box">Type a query for Github!</string>
+    <!-- text telling the user to enter a search query  -->
+    <string name="text_search_query">Enter a search query and your URL will show up here!</string>
+    <!-- hint telling the user the results will be displayed here-->
+    <string name="text_results">Make a search and your results will show up here!</string>
 </resources>
